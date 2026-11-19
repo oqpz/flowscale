@@ -1,0 +1,10 @@
+[package]
+name = "flowscale-capture"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+flowscale-abi.workspace = true
+flowscale-config.workspace = true
+windows.workspace = true

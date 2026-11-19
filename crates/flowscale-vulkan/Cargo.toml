@@ -1,0 +1,14 @@
+[package]
+name = "flowscale-vulkan"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ash = "0.38"
+windows.workspace = true
+
+[dev-dependencies]
+flowscale-overlay.workspace = true
+flowscale-capture.workspace = true
+

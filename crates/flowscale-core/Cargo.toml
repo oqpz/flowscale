@@ -1,0 +1,20 @@
+[package]
+name = "flowscale-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "flowscale_core"
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+flowscale-abi.workspace = true
+flowscale-config.workspace = true
+flowscale-capture.workspace = true
+flowscale-gpu.workspace = true
+flowscale-vulkan = { path = "../flowscale-vulkan" }
+flowscale-overlay.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+windows.workspace = true

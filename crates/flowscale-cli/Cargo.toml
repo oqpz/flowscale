@@ -1,0 +1,14 @@
+[package]
+name = "flowscale-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+flowscale-abi.workspace = true
+flowscale-config.workspace = true
+flowscale-capture.workspace = true
+flowscale-gpu.workspace = true
+flowscale-overlay.workspace = true
+flowscale-core.workspace = true
+windows.workspace = true

@@ -1,0 +1,12 @@
+/target/
+**/*.rs.bk
+*.pdb
+*.user
+*.suo
+.vscode/
+.idea/
+
+# Built app: upload to GitHub Releases, don't commit binaries
+/release/
+dist/
+node_modules/

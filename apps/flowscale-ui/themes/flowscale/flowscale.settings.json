@@ -1,0 +1,19 @@
+{
+  "name": "flowscale",
+  "like": "neutral",
+  "mode": "both",
+  "settings": [
+    {
+      "thing": "accent",
+      "value": "#00BF63",
+      "source": "dial"
+    },
+    {
+      "thing": "corners",
+      "value": "small",
+      "source": "dial"
+    }
+  ],
+  "lifted": [],
+  "palette": "d3fcdd9c8cf42d86a1469950c9225bff447f555ba7db108c9df1e46bb1ee2a1c"
+}

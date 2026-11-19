@@ -1,0 +1,12 @@
+[package]
+name = "flowscale-config"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+flowscale-abi.workspace = true
+roxmltree.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+windows.workspace = true

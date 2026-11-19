@@ -164,7 +164,7 @@ export function ProfileEditor({
   const scalingSummary =
     profile.scaling_type === 'Off'
       ? 'Scaling: Off'
-      : `Scaling: ${profile.scaling_type} (${profile.scaling_mode === 'Auto' ? 'Auto' : `${profile.scale_factor}x`})`;
+      : `Scaling: ${SCALING_TYPE_OPTIONS.find((o) => o.value === profile.scaling_type)?.label ?? profile.scaling_type} (${profile.scaling_mode === 'Auto' ? 'Auto' : `${profile.scale_factor}x`})`;
 
   const frameGenSummary =
     profile.frame_gen_engine === 'Off'

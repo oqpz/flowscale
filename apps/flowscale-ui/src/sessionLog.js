@@ -268,7 +268,7 @@ export function summarize(log, profile, now) {
       title: 'Active settings',
       rows: [
         ['Profile', profile.title],
-        ['Upscaler', profile.scaling_type === 'Off' ? 'Off' : `${profile.scaling_type}${profile.scaling_subtype ? ` ${profile.scaling_subtype}` : ''} · ${profile.scaling_mode === 'Custom' ? `×${profile.scale_factor}` : 'Auto'} · ${profile.fit_mode} · sharpness ${profile.sharpness}`],
+        ['Upscaler', profile.scaling_type === 'Off' ? 'Off' : `${profile.scaling_type === 'LS1' ? 'FlowSharp' : profile.scaling_type}${profile.scaling_subtype ? ` ${profile.scaling_subtype}` : ''} · ${profile.scaling_mode === 'Custom' ? `×${profile.scale_factor}` : 'Auto'} · ${profile.fit_mode} · sharpness ${profile.sharpness}`],
         ['Frame generation', frameGenLabel(profile)],
         ['Flow scale / quality', `${profile.flow_scale}% · ${profile.lsfg_performance}`],
         ['Capture API (requested)', profile.capture_api],

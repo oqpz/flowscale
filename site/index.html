@@ -21,11 +21,14 @@
     --muted: #9a9aa8;
     --accent: oklch(0.68 0.16 255);
     --accent-press: oklch(0.62 0.16 255);
+    --accent-btn: oklch(0.52 0.19 258);
+    --accent-btn-hover: oklch(0.47 0.19 258);
     --beak: oklch(0.78 0.15 65);
     --ok: oklch(0.78 0.15 150);
     --mono: "Cascadia Mono", "JetBrains Mono", Consolas, ui-monospace, monospace;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --radius: 16px;
+    interpolate-size: allow-keywords;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -61,44 +64,58 @@
 
   /* Buttons: hover lift, 0.97 press at 100ms, icon follows a beat later */
   .btn {
-    position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 12px;
+    position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 12px; overflow: hidden;
     font: 600 15px/1.2 inherit; text-decoration: none; border: 1px solid transparent; cursor: pointer;
     transition: transform 160ms var(--ease-out), background-color 160ms ease, border-color 160ms ease, box-shadow 200ms ease;
   }
   .btn:hover { transform: translate3d(0, -1px, 0); }
   .btn:active { transform: scale(0.97); transition-duration: 100ms; }
   .btn svg { transition: transform 260ms var(--ease-out) 30ms; }
-  .btn-primary { background: var(--accent); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 24px -10px oklch(0.68 0.16 255 / 0.7); }
-  .btn-primary:hover { background: var(--accent-press); }
+  .btn::after { /* diagonal sheen sweep */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.2) 50%, transparent 65%);
+    transform: translate3d(-120%, 0, 0);
+  }
+  .btn:hover::after { transform: translate3d(120%, 0, 0); transition: transform 600ms ease-out; }
+  .btn-primary { background: var(--accent-btn); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 24px -10px oklch(0.68 0.16 255 / 0.7); }
+  .btn-primary:hover { background: var(--accent-btn-hover); }
   .btn-primary:hover svg { transform: translate3d(0, 2px, 0); }
   .btn-ghost { border-color: var(--line-strong); color: var(--text); background: rgba(10, 10, 12, 0.6); backdrop-filter: blur(6px); }
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.24); }
   .btn-ghost:hover svg { transform: rotate(-10deg) scale(1.08); }
   :is(.btn, .nav-links a, .chip, .brand, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  /* Hero: copy left, 3D ASCII goose right */
-  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 40px 0 24px; }
-  h1 {
-    font-size: clamp(2.2rem, 3.6vw + 1rem, 3.7rem); line-height: 1.06; letter-spacing: -0.03em;
-    margin: 0 0 18px; max-width: 14ch; text-wrap: balance;
+  /* Hero: 2D goose mark, particle headline, copy, all centred */
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 0 8px; }
+  .hero::before { /* one soft accent glow, grained so it doesn't band */
+    content: ""; position: absolute; z-index: -1; inset: -120px -20vw auto; height: 620px; pointer-events: none;
+    background: radial-gradient(ellipse 50% 55% at 50% 45%, oklch(0.55 0.16 255 / 0.22), transparent 70%);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.6 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .lede { font-size: clamp(1.05rem, 0.5vw + 0.95rem, 1.2rem); color: var(--text-2); max-width: 46ch; margin: 0 0 28px; text-wrap: pretty; }
-  .cta { display: flex; gap: 10px; flex-wrap: wrap; }
-  .fine { color: var(--muted); font-size: 13px; margin-top: 14px; font-variant-numeric: tabular-nums; }
-  .goose-box { position: relative; aspect-ratio: 1.15; cursor: grab; touch-action: none; user-select: none; }
-  .goose-box:active { cursor: grabbing; }
-  #goose { width: 100%; height: 100%; display: block; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .goose {
+    position: relative; margin: 0 0 6px; padding: 6px 10px; border: 0; background: none; cursor: pointer;
+    border-radius: 14px; transition: transform 120ms ease-out;
+  }
+  .goose pre { margin: 0; font: 700 clamp(6.5px, 1.05vw, 9.5px)/1.12 var(--mono); letter-spacing: 0.02em; text-align: left; }
+  .goose .b { color: oklch(0.82 0.02 255); } .goose .h { color: #fff; } .goose .k { color: oklch(0.7 0.13 255); }
+  .goose .e { color: #fff; } .goose .p { color: var(--beak); }
+  .goose.honking pre { animation: honk 520ms var(--ease-out); }
+  @keyframes honk { 0% { transform: none; } 22% { transform: scale(0.94) translate3d(-3%, 2%, 0); } 48% { transform: scale(1.07) translate3d(3%, -1%, 0); } 100% { transform: none; } }
   .honk {
-    position: absolute; right: 6%; top: 8%; font: 700 15px/1 var(--mono); color: var(--beak);
+    position: absolute; left: 92%; top: 46%; font: 700 14px/1 var(--mono); color: var(--beak); white-space: nowrap;
     padding: 8px 12px; border-radius: 10px; background: var(--raised); border: 1px solid var(--line-strong);
-    opacity: 0; transform: scale(0.95) translate3d(0, 4px, 0); transform-origin: bottom left; pointer-events: none;
+    opacity: 0; transform: scale(0.95) translate3d(-6px, 4px, 0); transform-origin: left center; pointer-events: none;
     transition: opacity 160ms ease, transform 160ms var(--ease-out);
   }
   .honk.on { opacity: 1; transform: none; transition-duration: 200ms; }
-  .goose-hint { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; color: var(--muted); font-size: 13px; }
+  #headline { display: block; width: 100%; touch-action: pan-y; cursor: crosshair; }
+  .lede { font-size: clamp(1.05rem, 0.5vw + 0.95rem, 1.22rem); color: var(--text-2); max-width: 52ch; margin: 14px auto 24px; text-wrap: pretty; }
+  .cta { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .fine { color: var(--muted); font-size: 13px; margin-top: 14px; font-variant-numeric: tabular-nums; }
 
   /* Live preview */
-  section { padding: 80px 0 0; }
+  section { padding: 96px 0 0; }
   h2 { font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2.1rem); letter-spacing: -0.02em; margin: 0 0 8px; text-wrap: balance; }
   .sub { color: var(--text-2); margin: 0 0 28px; max-width: 62ch; text-wrap: pretty; }
   .demo { border-radius: 20px; padding: 8px; background: var(--surface); border: 1px solid var(--line);
@@ -106,7 +123,7 @@
   .bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px 12px; color: var(--muted); font-size: 13px; }
   .dots { display: flex; gap: 6px; }
   .dots i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
-  .bar .title { flex: 1; text-align: center; font-variant-numeric: tabular-nums; }
+  .bar .title { flex: 1; text-align: left; padding-left: 6px; font-variant-numeric: tabular-nums; }
   .bar a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 4px 8px; border-radius: 8px; transition: background-color 160ms ease, color 160ms ease; }
   .bar a:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
   .screen { position: relative; aspect-ratio: 1280 / 800; border-radius: 12px; overflow: hidden; background: #0e0e11; }
@@ -139,7 +156,8 @@
 
   /* Rest */
   .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; counter-reset: step; }
-  .step { padding: 22px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+  .step { padding: 22px; border-radius: var(--radius); background: #16161a; border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+  @media (hover: hover) { .step:hover { border-color: var(--line-strong); translate: 0 -2px; } }
   .step::before {
     counter-increment: step; content: counter(step);
     display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; margin-bottom: 12px;
@@ -154,6 +172,8 @@
   summary::-webkit-details-marker { display: none; }
   summary::after { content: "+"; color: var(--muted); transition: transform 200ms var(--ease-out); }
   details[open] summary::after { transform: rotate(45deg); }
+  details::details-content { block-size: 0; overflow: hidden; transition: block-size 250ms ease, content-visibility 250ms allow-discrete; }
+  details[open]::details-content { block-size: auto; }
   details p { margin: 0 0 16px; color: var(--text-2); max-width: 70ch; }
   code { font-family: var(--mono); font-size: 0.9em; background: rgba(255, 255, 255, 0.07); padding: 1px 6px; border-radius: 6px; }
   .reqs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 32px; margin: 0; }
@@ -168,16 +188,23 @@
   .links a:active { transform: scale(0.97); }
   .links svg { width: 16px; height: 16px; }
 
+  .reveal { opacity: 0; transform: translate3d(0, 12px, 0); transition: opacity 420ms var(--ease-out) calc(var(--i, 0) * 30ms), transform 420ms var(--ease-out) calc(var(--i, 0) * 30ms); }
+  .reveal.in { opacity: 1; transform: translate3d(0, 0, 0); }
+  .step.reveal { transition: opacity 600ms var(--ease-out) calc(var(--i, 0) * 30ms), transform 600ms var(--ease-out) calc(var(--i, 0) * 30ms), translate 200ms ease-out, border-color 200ms ease-out; }
+  @media (scripting: none) { .reveal { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .btn::after { display: none; } }
+
   @media (prefers-reduced-motion: no-preference) {
     .rise { animation: rise 600ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 30ms); }
     @keyframes rise { from { opacity: 0; transform: translate3d(0, 10px, 0); } }
   }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: 0ms !important; } }
   @media (max-width: 820px) {
-    .hero { grid-template-columns: 1fr; padding-top: 16px; }
-    .goose-box { max-width: 420px; width: 100%; margin: 0 auto; order: -1; }
+    .chip, .bar a, .nav-links a { min-height: 44px; display: inline-flex; align-items: center; }
+    .prompt input { font-size: 16px; }
     .nav-links a:not(.keep) { display: none; }
     .out { height: 170px; }
+    section { padding-top: 72px; }
   }
 </style>
 </head>
@@ -211,28 +238,22 @@
   </nav>
 
   <header class="hero">
-    <div>
-      <h1 class="rise">Sharper, smoother windowed games</h1>
-      <p class="lede rise" style="--i:1">FlowScale stretches a game window to your full screen without the blur, and adds generated frames between the real ones. A game running at 60 FPS can show 120.</p>
-      <div class="cta rise" style="--i:2">
-        <a class="btn btn-primary" href="https://github.com/oqpz/flowscale/releases/latest"><svg class="i"><use href="#i-dl"/></svg>Download for Windows</a>
-        <a class="btn btn-ghost" href="#try"><svg class="i"><use href="#i-play"/></svg>Try it in the browser</a>
-      </div>
-      <p class="fine rise" style="--i:3">Free · Windows 10 or 11 · 3.6 MB · no installer</p>
+    <button class="goose rise" id="goose" type="button" aria-label="FlowScale goose. Click to honk."><pre id="gooseArt" aria-hidden="true"></pre><span class="honk" id="honk" aria-hidden="true">HONK!</span></button>
+    <h1 class="sr-only">Sharper, smoother windowed games</h1>
+    <canvas id="headline" aria-hidden="true"></canvas>
+    <p class="lede rise" style="--i:2">FlowScale stretches a game window to your full screen without the blur, and adds generated frames between the real ones. A game running at 60 FPS can show 120.</p>
+    <div class="cta rise" style="--i:3">
+      <a class="btn btn-primary" href="https://github.com/oqpz/flowscale/releases/latest"><svg class="i"><use href="#i-dl"/></svg>Download for Windows</a>
+      <a class="btn btn-ghost" href="#try"><svg class="i"><use href="#i-play"/></svg>Try it in the browser</a>
     </div>
-    <div class="goose-box rise" style="--i:4" id="gooseBox" role="img" aria-label="FlowScale goose drawn in rotating 3D ASCII characters. Drag to spin, click to honk.">
-      <canvas id="goose"></canvas>
-      <div class="honk" id="honk">HONK!</div>
-      <div class="goose-hint">Drag to spin · click to honk</div>
-    </div>
+    <p class="fine rise" style="--i:4">Free · Windows 10 or 11 · 3.6 MB · no installer</p>
   </header>
 
   <section id="try">
-    <h2>Try it right here</h2>
-    <p class="sub">This is the real FlowScale interface running on sample data. Click around in it, or drive it from the console below.</p>
-    <div class="demo">
+    <h2 class="reveal">Try it right here</h2>
+    <p class="sub reveal" style="--i:1">This is the real FlowScale interface running on sample data. Click around in it, or drive it from the console below.</p>
+    <div class="demo reveal" style="--i:2">
       <div class="bar">
-        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
         <span class="title" id="winTitle">FlowScale · idle</span>
         <a href="demo/" target="_blank" rel="noopener"><svg class="i" style="width:14px;height:14px"><use href="#i-ext"/></svg>Full window</a>
       </div>
@@ -249,29 +270,29 @@
   </section>
 
   <section id="how">
-    <h2>How it works</h2>
-    <p class="sub">No game files are touched. FlowScale captures the window, processes it on your GPU and shows the result on top.</p>
+    <h2 class="reveal">How it works</h2>
+    <p class="sub reveal" style="--i:1">No game files are touched. FlowScale captures the window, processes it on your GPU and shows the result on top.</p>
     <div class="steps">
-      <div class="step"><h3>Run your game windowed</h3><p>Windowed or borderless, not exclusive fullscreen. A lower resolution than your screen gives the upscaler room to help.</p></div>
-      <div class="step"><h3>Pick a preset</h3><p><em>Smooth 2x + FlowSharp</em> is a good start. Save a profile per game and it can kick in automatically.</p></div>
-      <div class="step"><h3>Press Scale</h3><p>Or <code>Ctrl</code>+<code>Alt</code>+<code>S</code>, then click into the game. Press it again to stop.</p></div>
+      <div class="step reveal" style="--i:2"><h3>Run your game windowed</h3><p>Windowed or borderless, not exclusive fullscreen. A lower resolution than your screen gives the upscaler room to help.</p></div>
+      <div class="step reveal" style="--i:3"><h3>Pick a preset</h3><p><em>Smooth 2x + FlowSharp</em> is a good start. Save a profile per game and it can kick in automatically.</p></div>
+      <div class="step reveal" style="--i:4"><h3>Press Scale</h3><p>Or <code>Ctrl</code>+<code>Alt</code>+<code>S</code>, then click into the game. Press it again to stop.</p></div>
     </div>
   </section>
 
   <section>
-    <h2>What you get</h2>
-    <p class="sub">FlowGen 3 estimates motion between two real frames and draws the ones in between, at a fixed multiplier or holding a target like 144 FPS.</p>
+    <h2 class="reveal">What you get</h2>
+    <p class="sub reveal" style="--i:1">FlowGen 3 estimates motion between two real frames and draws the ones in between, at a fixed multiplier or holding a target like 144 FPS.</p>
     <div class="feats">
-      <div class="feat"><svg><use href="#i-up"/></svg><h3>Upscaling</h3><p>FlowSharp, FSR 1, NIS, SGSR, Anime4K, xBR for pixel art, and plain integer scaling.</p></div>
-      <div class="feat"><svg><use href="#i-cam"/></svg><h3>Three capture modes</h3><p>DXGI is the fastest. Windows Graphics Capture handles HDR and awkward borderless windows.</p></div>
-      <div class="feat"><svg><use href="#i-prof"/></svg><h3>Per-game profiles</h3><p>Match a game's .exe and FlowScale starts a few seconds after you switch to it.</p></div>
-      <div class="feat"><svg><use href="#i-tray"/></svg><h3>A log that explains itself</h3><p>Captured vs generated FPS, dropped frames and GPU time, with a hint when your settings are too heavy.</p></div>
+      <div class="feat reveal" style="--i:2"><svg><use href="#i-up"/></svg><h3>Upscaling</h3><p>FlowSharp, FSR 1, NIS, SGSR, Anime4K, xBR for pixel art, and plain integer scaling.</p></div>
+      <div class="feat reveal" style="--i:3"><svg><use href="#i-cam"/></svg><h3>Three capture modes</h3><p>DXGI is the fastest. Windows Graphics Capture handles HDR and awkward borderless windows.</p></div>
+      <div class="feat reveal" style="--i:4"><svg><use href="#i-prof"/></svg><h3>Per-game profiles</h3><p>Match a game's .exe and FlowScale starts a few seconds after you switch to it.</p></div>
+      <div class="feat reveal" style="--i:5"><svg><use href="#i-tray"/></svg><h3>A log that explains itself</h3><p>Captured vs generated FPS, dropped frames and GPU time, with a hint when your settings are too heavy.</p></div>
     </div>
   </section>
 
   <section>
-    <h2>Requirements</h2>
-    <dl class="reqs">
+    <h2 class="reveal">Requirements</h2>
+    <dl class="reqs reveal" style="--i:1">
       <div><dt>OS</dt><dd>Windows 10 or 11, 64-bit</dd></div>
       <div><dt>GPU</dt><dd>DirectX 11 capable</dd></div>
       <div><dt>Runtime</dt><dd>WebView2 (already on most PCs)</dd></div>
@@ -280,12 +301,12 @@
   </section>
 
   <section id="faq">
-    <h2>Questions</h2>
-    <details><summary>Windows says the app is unrecognized. Is it safe?</summary><p>The exe isn’t code-signed yet, so SmartScreen warns about it. Click <em>More info</em> then <em>Run anyway</em>. The full source is on GitHub if you’d rather build it yourself.</p></details>
-    <details><summary>Does it work in exclusive fullscreen?</summary><p>No. Windows can’t capture exclusive fullscreen the way FlowScale needs, so switch the game to windowed or borderless.</p></details>
-    <details><summary>Will it get me banned?</summary><p>FlowScale doesn’t inject into or modify games; it only captures the window like a recording app does. Still, anti-cheat rules vary by game, so check if you play competitively.</p></details>
-    <details><summary>Generated frames look smeary or my FPS dips.</summary><p>Open <em>Log</em>. If generation time is close to the frame budget, lower <em>Flow scale</em> from 100% to 50%. It cuts the GPU cost of frame generation by about four times.</p></details>
-    <details><summary>Does it add input lag?</summary><p>Some. Generated frames need the next real frame first, so expect roughly one game frame of extra delay. It feels smoother but isn’t faster.</p></details>
+    <h2 class="reveal">Questions</h2>
+    <details class="reveal" style="--i:1"><summary>Windows says the app is unrecognized. Is it safe?</summary><p>The exe isn’t code-signed yet, so SmartScreen warns about it. Click <em>More info</em> then <em>Run anyway</em>. The full source is on GitHub if you’d rather build it yourself.</p></details>
+    <details class="reveal" style="--i:2"><summary>Does it work in exclusive fullscreen?</summary><p>No. Windows can’t capture exclusive fullscreen the way FlowScale needs, so switch the game to windowed or borderless.</p></details>
+    <details class="reveal" style="--i:3"><summary>Will it get me banned?</summary><p>FlowScale doesn’t inject into or modify games; it only captures the window like a recording app does. Still, anti-cheat rules vary by game, so check if you play competitively.</p></details>
+    <details class="reveal" style="--i:4"><summary>Generated frames look smeary or my FPS dips.</summary><p>Open <em>Log</em>. If generation time is close to the frame budget, lower <em>Flow scale</em> from 100% to 50%. It cuts the GPU cost of frame generation by about four times.</p></details>
+    <details class="reveal" style="--i:5"><summary>Does it add input lag?</summary><p>Some. Generated frames need the next real frame first, so expect roughly one game frame of extra delay. It feels smoother but isn’t faster.</p></details>
   </section>
 </div>
 
@@ -310,7 +331,8 @@ addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.cl
 (() => {
   const cv = document.getElementById('bg'), ctx = cv.getContext('2d');
   const RAMP = ' .·:-=+*';
-  const CW = 11, CH = 20;
+  const CH = 20;
+  let CW = 8;
   let cols = 0, rows = 0, dpr = 1;
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2);
@@ -318,10 +340,13 @@ addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.cl
     cols = Math.ceil(innerWidth / CW) + 1; rows = Math.ceil(innerHeight / CH) + 1;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.font = '13px "Cascadia Mono", Consolas, monospace';
+    CW = ctx.measureText('M').width; // row strings advance by the real glyph width
+    cols = Math.ceil(innerWidth / CW) + 1;
     ctx.textBaseline = 'top';
   }
   size(); addEventListener('resize', size);
-  let last = 0;
+  addEventListener('scroll', () => { cv.style.opacity = Math.max(0.25, 1 - scrollY / (innerHeight * 0.9)); }, {passive: true});
+  let last = -1e9;
   function frame(now) {
     if (!reduce) requestAnimationFrame(frame);
     if (document.hidden || now - last < 40) return; // ~25 fps is plenty for a backdrop
@@ -358,136 +383,197 @@ addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.cl
   requestAnimationFrame(frame);
 })();
 
-/* ---------- 3D ASCII goose (ray-marched signed distance fields) ---------- */
-const goose = (() => {
-  const box = document.getElementById('gooseBox'), cv = document.getElementById('goose'), ctx = cv.getContext('2d');
-  const honkEl = document.getElementById('honk');
-  const RAMP = '.,:;=+*#%@';
-  const COLS = 70, ROWS = 38;
-  let cw = 0, ch = 0;
-  function size() {
-    const r = box.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
-    cv.width = r.width * dpr; cv.height = r.height * dpr;
-    cw = cv.width / COLS; ch = cv.height / ROWS;
-    ctx.font = `bold ${Math.floor(ch * 0.95)}px "Cascadia Mono", Consolas, monospace`;
-    ctx.textBaseline = 'top'; ctx.textAlign = 'center';
-  }
-  new ResizeObserver(size).observe(box); size();
+/* ---------- Particle headline: the h1 rebuilt from ASCII glyphs ---------- */
+const headline = (() => {
+  const cv = document.getElementById('headline'), ctx = cv.getContext('2d');
+  const GLYPHS = '.:-=+*#';
+  let W = 0, H = 0, dpr = 1, cell = 6, n = 0;
+  let hx, hy, px, py, vx, vy, start, gi, tone; // typed arrays, one slot per particle
+  let running = false, quiet = 0, t0 = 0;
+  const ptr = {x: -1e4, y: -1e4};
 
-  const len = (x, y, z) => Math.sqrt(x * x + y * y + z * z);
-  function ell(px, py, pz, rx, ry, rz) {
-    const k0 = len(px / rx, py / ry, pz / rz), k1 = len(px / (rx * rx), py / (ry * ry), pz / (rz * rz));
-    return k0 * (k0 - 1) / k1;
-  }
-  function cap(px, py, pz, ax, ay, az, bx, by, bz, r) {
-    const pax = px - ax, pay = py - ay, paz = pz - az, bax = bx - ax, bay = by - ay, baz = bz - az;
-    const h = Math.max(0, Math.min(1, (pax * bax + pay * bay + paz * baz) / (bax * bax + bay * bay + baz * baz)));
-    return len(pax - bax * h, pay - bay * h, paz - baz * h) - r;
-  }
-  const smin = (a, b, k) => { const h = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - h * h * k * 0.25; };
-  let neck = 0; // honk animation: <0 pulls back (anticipation), >0 stretches forward
-  let mat = 0;
-  function sdf(x, y, z) {
-    const hx = 0.98 + neck * 0.25, hy = 1.18 - Math.abs(neck) * 0.05;
-    let d = ell(x, y, z, 1.0, 0.55, 0.62);
-    d = smin(d, ell(x + 0.95, y - 0.18, z, 0.38, 0.18, 0.3), 0.25);
-    d = smin(d, cap(x, y, z, 0.62, 0.2, 0, hx - 0.05, hy - 0.1, 0, 0.17), 0.22);
-    d = smin(d, ell(x - hx, y - hy, z, 0.3, 0.26, 0.25), 0.12);
-    const wing = Math.min(ell(x + 0.1, y - 0.18, z - 0.52, 0.72, 0.3, 0.12), ell(x + 0.1, y - 0.18, z + 0.52, 0.72, 0.3, 0.12));
-    d = smin(d, wing, 0.06);
-    mat = 0;
-    const open = Math.max(0, neck) * 0.08;
-    const beak = Math.min(ell(x - hx - 0.36, y - hy + 0.02 - open, z, 0.26, 0.07, 0.11), ell(x - hx - 0.32, y - hy + 0.1 + open, z, 0.2, 0.05, 0.09));
-    if (beak < d) { d = beak; mat = 1; }
-    const legs = Math.min(cap(x, y, z, 0.1, -0.45, 0.22, 0.12, -1.05, 0.22, 0.05), cap(x, y, z, 0.1, -0.45, -0.22, 0.12, -1.05, -0.22, 0.05));
-    const feet = Math.min(ell(x - 0.24, y + 1.07, z - 0.22, 0.18, 0.04, 0.1), ell(x - 0.24, y + 1.07, z + 0.22, 0.18, 0.04, 0.1));
-    const lf = Math.min(legs, feet);
-    if (lf < d) { d = lf; mat = 1; }
-    const eye = Math.min(len(x - hx - 0.13, y - hy - 0.08, z - 0.19), len(x - hx - 0.13, y - hy - 0.08, z + 0.19)) - 0.055;
-    if (eye < d) { d = eye; mat = 2; }
-    return d;
-  }
+  function layout() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.parentElement.clientWidth;
+    if (W < 40) return; // not laid out yet; the ResizeObserver calls again
+    const narrow = W < 560;
+    const lines = narrow ? ['Sharper,', 'smoother', 'windowed', 'games'] : ['Sharper, smoother', 'windowed games'];
+    const off = document.createElement('canvas').getContext('2d', {willReadFrequently: true});
+    const family = '"Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif';
+    // Fit the widest line to ~94% of the column, capped so desktop doesn't shout.
+    let fs = 100;
+    off.font = `800 ${fs}px ${family}`;
+    const widest = Math.max(...lines.map((l) => off.measureText(l).width));
+    fs = Math.min(narrow ? 76 : 108, fs * (W * 0.94) / widest);
+    const lh = fs * (narrow ? 0.98 : 1.02);
+    H = Math.ceil(lh * lines.length + fs * 0.18);
+    cell = Math.max(4, Math.round(fs / (narrow ? 15 : 19)));
+    off.canvas.width = W; off.canvas.height = H;
+    off.font = `800 ${fs}px ${family}`;
+    off.textAlign = 'center'; off.textBaseline = 'alphabetic'; off.fillStyle = '#fff';
+    lines.forEach((l, i) => off.fillText(l, W / 2, fs * 0.9 + i * lh));
+    const img = off.getImageData(0, 0, W, H).data;
 
-  let yaw = 0.6, pitch = 0.18, vel = 0, dragging = false, moved = 0, lastX = 0, lastT = 0;
-  let honkT = -10;
-  box.addEventListener('pointerdown', (e) => {
-    dragging = true; moved = 0; lastX = e.clientX; lastT = performance.now(); vel = 0;
-    box.setPointerCapture(e.pointerId);
-  });
-  box.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - lastX, now = performance.now();
-    yaw += dx * 0.012; // 1:1 with the pointer while held
-    vel = dx * 0.012 / Math.max(1, now - lastT) * 16;
-    moved += Math.abs(dx); lastX = e.clientX; lastT = now;
-    if (reduce) draw(performance.now());
-  });
-  box.addEventListener('pointerup', (e) => {
-    dragging = false;
-    if (moved < 4) honk(e.clientX, e.clientY);
-  });
-  box.addEventListener('pointercancel', () => { dragging = false; });
-
-  function honk(px, py) {
-    honkT = performance.now() / 1000;
-    honkEl.classList.add('on');
-    clearTimeout(honk.tm); honk.tm = setTimeout(() => honkEl.classList.remove('on'), 900);
-    const r = box.getBoundingClientRect();
-    ripples.push({x: px ?? r.left + r.width * 0.7, y: py ?? r.top + r.height * 0.35, t: performance.now() / 1000});
-    if (reduce) draw(performance.now());
-  }
-
-  function draw(now) {
-    const t = now / 1000;
-    const ht = t - honkT;
-    // Anticipation (pull back) then stretch forward, then settle.
-    neck = ht < 0.12 ? -ht / 0.12 * 0.5 : ht < 0.3 ? -0.5 + (ht - 0.12) / 0.18 * 1.5 : ht < 0.9 ? 1 - (ht - 0.3) / 0.6 : 0;
-    if (!dragging && !reduce) { yaw += vel + 0.006; vel *= 0.94; }
-    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
-    const bob = reduce ? 0 : Math.sin(t * 1.6) * 0.04;
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    const aspect = (cw / ch);
-    for (let j = 0; j < ROWS; j++) {
-      for (let i = 0; i < COLS; i++) {
-        // Camera ray in view space (orthographic-ish perspective).
-        const u = ((i + 0.5) / COLS * 2 - 1) * 1.6 * (COLS * aspect / ROWS);
-        const v = -((j + 0.5) / ROWS * 2 - 1) * 1.6 + 0.2 + bob;
-        let ox = u, oy = v, oz = -5, dx = u * 0.04, dy = v * 0.04, dz = 1;
-        const dl = len(dx, dy, dz); dx /= dl; dy /= dl; dz /= dl;
-        // Rotate ray into object space: pitch around X, then yaw around Y.
-        let ty = oy * cp - oz * sp, tz = oy * sp + oz * cp; oy = ty; oz = tz;
-        ty = dy * cp - dz * sp; tz = dy * sp + dz * cp; dy = ty; dz = tz;
-        let tx = ox * cy + oz * sy; tz = -ox * sy + oz * cy; ox = tx; oz = tz;
-        tx = dx * cy + dz * sy; tz = -dx * sy + dz * cy; dx = tx; dz = tz;
-        let dist = 3.2, hit = false;
-        for (let s = 0; s < 44 && dist < 7.5; s++) {
-          const d = sdf(ox + dx * dist, oy + dy * dist, oz + dz * dist);
-          if (d < 0.004) { hit = true; break; }
-          dist += d;
-        }
-        if (!hit) continue;
-        const px = ox + dx * dist, py = oy + dy * dist, pz = oz + dz * dist;
-        const m = mat, e = 0.01, d0 = sdf(px, py, pz);
-        let nx = sdf(px + e, py, pz) - d0, ny = sdf(px, py + e, pz) - d0, nz = sdf(px, py, pz + e) - d0;
-        const nl = len(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
-        // Light fixed to the camera's upper-left, so shading moves as the goose turns.
-        const lx = -0.5 * cy + -0.6 * sy, lz = 0.5 * sy - 0.6 * cy, ly = 0.65;
-        const diff = Math.max(0, nx * lx + ny * ly + nz * lz);
-        const rim = Math.pow(1 - Math.abs(nx * dx + ny * dy + nz * dz), 3);
-        const lum = Math.min(0.999, 0.22 + diff * 0.72 + rim * 0.25);
-        const c = RAMP[Math.floor(lum * RAMP.length)];
-        ctx.fillStyle = m === 1 ? `oklch(${0.55 + lum * 0.3} 0.16 60)` : m === 2 ? '#1a1a1f' : `oklch(${0.45 + lum * 0.5} ${0.03 + lum * 0.04} 255)`;
-        ctx.fillText(m === 2 ? '@' : c, (i + 0.5) * cw, j * ch);
+    // Coverage per cell picks the glyph: solid interiors read as #/@, edges fall off to . and :
+    const pts = [];
+    for (let y = 0; y < H; y += cell) for (let x = 0; x < W; x += cell) {
+      let sum = 0, cnt = 0;
+      for (let yy = y; yy < Math.min(H, y + cell); yy += 2) for (let xx = x; xx < Math.min(W, x + cell); xx += 2) { sum += img[(yy * W + xx) * 4 + 3]; cnt++; }
+      const cov = sum / (cnt * 255);
+      if (cov > 0.12) pts.push(x + cell / 2, y + cell / 2, cov);
+    }
+    n = pts.length / 3;
+    const prev = px && px.length === n;
+    hx = new Float32Array(n); hy = new Float32Array(n); gi = new Uint8Array(n); tone = new Float32Array(n);
+    if (!prev) { px = new Float32Array(n); py = new Float32Array(n); vx = new Float32Array(n); vy = new Float32Array(n); start = new Float32Array(n); }
+    for (let i = 0; i < n; i++) {
+      hx[i] = pts[i * 3]; hy[i] = pts[i * 3 + 1];
+      const cov = pts[i * 3 + 2];
+      gi[i] = Math.min(GLYPHS.length - 1, Math.floor(cov * GLYPHS.length));
+      tone[i] = cov;
+      if (!prev) {
+        // Enter from a loose cloud, staggered left to right so the line "writes" itself.
+        const a = Math.random() * Math.PI * 2, r = 80 + Math.random() * W * 0.35;
+        px[i] = W / 2 + Math.cos(a) * r; py[i] = H / 2 + Math.sin(a) * r * 0.5;
+        start[i] = (hx[i] / W) * 420 + Math.random() * 160;
       }
     }
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = `700 ${Math.round(cell * (narrow ? 1.25 : 1.2))}px "Cascadia Mono", Consolas, monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (reduce) { for (let i = 0; i < n; i++) { px[i] = hx[i]; py[i] = hy[i]; } draw(); }
+    else wake();
   }
-  function loop(now) {
-    requestAnimationFrame(loop);
-    const r = box.getBoundingClientRect();
-    if (document.hidden || r.bottom < 0 || r.top > innerHeight) return;
-    draw(now);
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Two passes keep fillStyle changes to a handful per frame.
+    for (let pass = 0; pass < 3; pass++) {
+      ctx.fillStyle = pass === 0 ? 'oklch(0.62 0.12 255)' : pass === 1 ? 'oklch(0.86 0.04 255)' : '#ffffff';
+      for (let i = 0; i < n; i++) {
+        const band = tone[i] < 0.45 ? 0 : tone[i] < 0.85 ? 1 : 2;
+        if (band !== pass) continue;
+        // Displaced glyphs heat toward the accent so motion is legible.
+        const off = Math.abs(px[i] - hx[i]) + Math.abs(py[i] - hy[i]);
+        ctx.globalAlpha = off > 3 ? Math.max(0.35, 1 - off / 260) : 1;
+        ctx.fillText(GLYPHS[gi[i]], px[i], py[i]);
+      }
+    }
+    ctx.globalAlpha = 1;
   }
-  if (reduce) { draw(0); addEventListener('resize', () => draw(0)); } else requestAnimationFrame(loop);
+
+  let lastStep = 0;
+  function step(now) {
+    if (!t0) t0 = now;
+    // Fixed 60 Hz substeps so slow or throttled frames still settle on schedule.
+    const subs = lastStep ? Math.min(8, Math.max(1, Math.round((now - lastStep) / 16.7))) : 1;
+    lastStep = now;
+    let energy = 0;
+    for (let k = subs - 1; k >= 0; k--) energy = physics(now - t0 - k * 16.7);
+    draw();
+    quiet = energy < n * 0.004 ? quiet + 1 : 0;
+    if (quiet > 30) { running = false; lastStep = 0; return; }
+    requestAnimationFrame(step);
+  }
+  function physics(el) {
+    let energy = 0;
+    const R = 110, R2 = R * R;
+    for (let i = 0; i < n; i++) {
+      if (el < start[i]) { energy += 1; continue; }
+      let ax = (hx[i] - px[i]) * 0.09, ay = (hy[i] - py[i]) * 0.09;
+      const dx = px[i] - ptr.x, dy = py[i] - ptr.y, d2 = dx * dx + dy * dy;
+      if (d2 < R2) { const d = Math.sqrt(d2) || 1, f = (1 - d / R) * 3.2; ax += dx / d * f; ay += dy / d * f; }
+      vx[i] = (vx[i] + ax) * 0.8; vy[i] = (vy[i] + ay) * 0.8;
+      px[i] += vx[i]; py[i] += vy[i];
+      energy += Math.abs(vx[i]) + Math.abs(vy[i]);
+    }
+    return energy;
+  }
+  function wake() { quiet = 0; if (!running && !reduce) { running = true; requestAnimationFrame(step); } }
+
+  function impulse(x, y, power) {
+    for (let i = 0; i < n; i++) {
+      const dx = px[i] - x, dy = py[i] - y, d = Math.hypot(dx, dy) || 1;
+      const f = power * Math.max(0, 1 - d / (W * 0.6));
+      vx[i] += dx / d * f * (0.7 + Math.random() * 0.6); vy[i] += dy / d * f * (0.7 + Math.random() * 0.6);
+    }
+    wake();
+  }
+
+  addEventListener('pointermove', (e) => {
+    const r = cv.getBoundingClientRect();
+    ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top;
+    if (ptr.y > -120 && ptr.y < H + 120) wake();
+  }, {passive: true});
+  cv.addEventListener('pointerleave', () => { ptr.x = ptr.y = -1e4; wake(); });
+  cv.addEventListener('click', (e) => {
+    const r = cv.getBoundingClientRect();
+    impulse(e.clientX - r.left, e.clientY - r.top, 16);
+    ripples.push({x: e.clientX, y: e.clientY, t: performance.now() / 1000});
+  });
+  let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(layout, 120); }).observe(cv.parentElement);
+  (document.fonts?.ready || Promise.resolve()).then(layout);
+  // Burst from a page point (the goose's beak).
+  return {burst(cx, cy) { const r = cv.getBoundingClientRect(); impulse(cx - r.left, cy - r.top, 11); }};
+})();
+
+/* ---------- 2D ASCII goose: blinks, leans toward the cursor, honks ---------- */
+const goose = (() => {
+  const btn = document.getElementById('goose'), art = document.getElementById('gooseArt'), honkEl = document.getElementById('honk');
+  const ART = [
+    '             ::::::::::::::::',
+    '        :::::::::::::::::::::::::::::',
+    '     ::::::::::::::::::::::::::::::::::',
+    '      :::::::::############:::::::::::',
+    '   :::::::::#########++++++++:::::::::::',
+    '   :::::::#####++++++++++++::::::::::::',
+    '   :::::::###++++++++:::::::::::::::::::::',
+    '     :::::::::::::::::::::::::::::::::::::',
+    '   :::::::::::::       :::::::::::::::::::',
+    '   :::::::::::           :::::::::::::::::',
+    '   :::::::                 :::::::::::::::',
+    '                           :::::::::::::::',
+    '                           :::::::::::::::',
+    '                           :::::::::::::::::',
+    '                         :::::::::::::::::::::',
+    '                         ::::@@..::::==========',
+    '                         ::::@@@@::::========',
+    '                           ::::::::::======',
+    '                             :::::::::::',
+    '                               :::::::',
+  ];
+  const cls = {':': 'b', '#': 'h', '+': 'k', '@': 'e', '.': 'e', '=': 'p'};
+  art.innerHTML = ART.map((row) => row.replace(/(:+|#+|\++|[@.]+|=+)/g, (m) => `<span class="${cls[m[0]]}">${m}</span>`)).join('\n');
+  const eyes = [...art.querySelectorAll('.e')];
+  const eyeText = eyes.map((e) => e.textContent);
+
+  function blink() {
+    eyes.forEach((e) => { e.textContent = '-'.repeat(e.textContent.length); });
+    setTimeout(() => eyes.forEach((e, i) => { e.textContent = eyeText[i]; }), 130);
+  }
+  if (!reduce) setInterval(() => { if (!document.hidden) blink(); }, 4800);
+
+  addEventListener('pointermove', (e) => {
+    if (reduce) return;
+    const r = btn.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width / 2)) / innerWidth, dy = (e.clientY - (r.top + r.height / 2)) / innerHeight;
+    btn.style.transform = `rotate(${Math.max(-4, Math.min(4, dx * 8))}deg) translate3d(${dx * 6}px, ${dy * 4}px, 0)`;
+  }, {passive: true});
+
+  function honk() {
+    btn.classList.remove('honking'); void btn.offsetWidth; btn.classList.add('honking');
+    honkEl.classList.add('on');
+    clearTimeout(honk.tm); honk.tm = setTimeout(() => honkEl.classList.remove('on'), 1000);
+    // The pop lands ~120 ms in; send the burst then, from the beak.
+    setTimeout(() => {
+      const r = btn.getBoundingClientRect();
+      const bx = r.left + r.width * 0.88, by = r.top + r.height * 0.8;
+      headline.burst(bx, by);
+      ripples.push({x: bx, y: by, t: performance.now() / 1000});
+    }, reduce ? 0 : 120);
+  }
+  btn.addEventListener('click', honk);
   return {honk};
 })();
 
@@ -638,6 +724,19 @@ const goose = (() => {
     print('FlowScale preview ready, running on sample data.', 'dim');
     print('Try: scale, preset adaptive, log, theme light. Tab completes, ↑ recalls.', 'dim');
   });
+})();
+</script>
+<script>
+(() => {
+  const els = document.querySelectorAll('.reveal');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+    els.forEach((el) => el.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }, {rootMargin: '0px 0px -8% 0px'});
+  els.forEach((el) => io.observe(el));
 })();
 </script>
 </body>
